@@ -1,8 +1,8 @@
 
 # WrappedUnions.jl
 
-[![Build Status](https://github.com/Tortar/WrappedUnions.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/Tortar/WrappedUnions.jl/actions/workflows/CI.yml?query=branch%3Amain)
-[![Coverage](https://codecov.io/gh/Tortar/WrappedUnions.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/Tortar/WrappedUnions.jl)
+[![Build Status](https://github.com/ameligrana/WrappedUnions.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/Tortar/WrappedUnions.jl/actions/workflows/CI.yml?query=branch%3Amain)
+[![Coverage](https://codecov.io/gh/ameligrana/WrappedUnions.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/ameligrana/WrappedUnions.jl)
 [![Aqua](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
 
 This package offers a minimal interface to work efficiently with a `Union` of types wrapped into a struct
