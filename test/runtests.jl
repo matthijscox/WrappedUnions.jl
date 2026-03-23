@@ -3,6 +3,8 @@ using WrappedUnions
 
 using Aqua, Test
 
+const TYPE_WIDEN_U = Union{Vector{Int64}, Vector{Float64}, Vector{Union{Int64, Int32}}}
+
 "docstring"
 @wrapped struct K 
     union::Union{Int}
@@ -92,6 +94,24 @@ end
     ou2 = OpenUnion{Union{Nothing, Char, Int, Float64}}(5)
     @test unwrap(ou2) == 5
     @test uniontype(ou2) == Union{Nothing, Char, Int, Float64}
+
+    @testset "Type Widening" begin
+        g(x::Int64) = x > 0 ? Union{Int64, Int32}[] : Int64[]
+        g(x::Float64) = x > 0 ? Union{Float64, Float32}[] : Float64[]
+
+        @wrapped struct In
+            union::Union{Int64, Float64}
+        end
+
+        # type via module-level const alias
+        g(x::In) = @unionsplit g(x)::TYPE_WIDEN_U
+        out = Base.infer_return_type(g, (In,))
+        @test out == TYPE_WIDEN_U
+        # define type directly inline
+        h(x::In) = @unionsplit g(x)::Union{Vector{Int64}, Vector{Float64}, Vector{Union{Int64, Int32}}}
+        out2 = Base.infer_return_type(h, (In,))
+        @test out2 == TYPE_WIDEN_U
+    end
 end
 
 # benchmark

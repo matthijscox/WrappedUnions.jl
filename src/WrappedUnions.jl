@@ -57,20 +57,29 @@ end
 
 """
     @unionsplit f(args...; kwargs...)
+    # or
+    @unionsplit f(args...; kwargs...)::ReturnType
 
 Calls `unionsplit(f, args, kwargs)`. See its docstring for further information.
 """
 macro unionsplit(expr)
-    expr.head != :call && error("Expression is not a function call")
-    f = expr.args[1]
-    if expr.args[2] isa Expr && expr.args[2].head == :parameters
-        pos_args, kw_args = expr.args[3:end], expr.args[2].args
-    else
-        pos_args, kw_args = expr.args[2:end], []
+    ret_type = nothing
+    call_expr = expr
+
+    if call_expr isa Expr && call_expr.head == :(::)
+        call_expr, ret_type = call_expr.args
     end
-    return esc(quote
-        $WrappedUnions.unionsplit($f, ($(pos_args...),), (;$(kw_args...)))
-    end)
+
+    call_expr isa Expr && call_expr.head == :call || error("Expression is not a function call")
+    f = call_expr.args[1]
+    if call_expr.args[2] isa Expr && call_expr.args[2].head == :parameters
+        pos_args, kw_args = call_expr.args[3:end], call_expr.args[2].args
+    else
+        pos_args, kw_args = call_expr.args[2:end], []
+    end
+
+    call = :($WrappedUnions.unionsplit($f, ($(pos_args...),), (;$(kw_args...))))
+    return esc(isnothing(ret_type) ? call : :($call::$ret_type))
 end
 
 
