@@ -30,7 +30,11 @@ splittedsum(x::Y{A,B}, y, z::X; q::X, t) where {A,B} = @unionsplit sumt(x, y, z;
     union::U
 end
 
-@testset "WrappedUnions.jl" begin
+@wrapped struct In
+    union::Union{Int64, Float64}
+end
+
+@testset "Basic Tests" begin
     
     if "CI" in keys(ENV)
         @testset "Code quality (Aqua.jl)" begin
@@ -94,15 +98,13 @@ end
     ou2 = OpenUnion{Union{Nothing, Char, Int, Float64}}(5)
     @test unwrap(ou2) == 5
     @test uniontype(ou2) == Union{Nothing, Char, Int, Float64}
+end
 
+if VERSION >= v"1.12"
     @testset "Type Widening" begin
         g(x::Int64) = x > 0 ? Union{Int64, Int32}[] : Int64[]
         g(x::Float64) = x > 0 ? Union{Float64, Float32}[] : Float64[]
-
-        @wrapped struct In
-            union::Union{Int64, Float64}
-        end
-
+    
         # type via module-level const alias
         g(x::In) = @unionsplit g(x)::TYPE_WIDEN_U
         out = Base.infer_return_type(g, (In,))
