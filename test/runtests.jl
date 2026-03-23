@@ -100,20 +100,17 @@ end
     @test uniontype(ou2) == Union{Nothing, Char, Int, Float64}
 end
 
-if VERSION >= v"1.12"
-    @testset "Type Widening" begin
-        g(x::Int64) = x > 0 ? Union{Int64, Int32}[] : Int64[]
-        g(x::Float64) = x > 0 ? Union{Float64, Float32}[] : Float64[]
+@testset "Type Widening" begin
+    g(x::Int64) = x > 0 ? Union{Int64, Int32}[] : Int64[]
+    g(x::Float64) = x > 0 ? Union{Float64, Float32}[] : Float64[]
     
-        # type via module-level const alias
-        g(x::In) = @unionsplit g(x)::TYPE_WIDEN_U
-        out = Base.infer_return_type(g, (In,))
-        @test out == TYPE_WIDEN_U
-        # define type directly inline
-        h(x::In) = @unionsplit g(x)::Union{Vector{Int64}, Vector{Float64}, Vector{Union{Int64, Int32}}}
-        out2 = Base.infer_return_type(h, (In,))
-        @test out2 == TYPE_WIDEN_U
-    end
+    # type via module-level const alias
+    g(x::In) = @unionsplit g(x)::TYPE_WIDEN_U
+    @inferred TYPE_WIDEN_U g(In(1))
+
+    # define type directly inline
+    h(x::In) = @unionsplit g(x)::Union{Vector{Int64}, Vector{Float64}, Vector{Union{Int64, Int32}}}
+    @inferred TYPE_WIDEN_U h(In(1))
 end
 
 # benchmark
