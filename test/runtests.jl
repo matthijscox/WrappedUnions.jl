@@ -107,10 +107,12 @@ end
     # type via module-level const alias
     g(x::In) = @unionsplit g(x)::TYPE_WIDEN_U
     @inferred TYPE_WIDEN_U g(In(1))
+    @test g(In(1)) == Int64[]
 
     # define type directly inline
     h(x::In) = @unionsplit g(x)::Union{Vector{Int64}, Vector{Float64}, Vector{Union{Int64, Int32}}}
     @inferred TYPE_WIDEN_U h(In(1))
+    @test h(In(1)) == Int64[]
 end
 
 # benchmark
